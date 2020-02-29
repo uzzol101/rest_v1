@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::schema::products;
-use crate::db_connection::establish_connection;
+use crate::db_connection::{PgPooledConnection};
 
 
 #[derive(Queryable, Serialize, Deserialize, AsChangeset)]
@@ -22,30 +22,26 @@ pub struct NewProduct {
 
 
 impl Product {
-    pub fn all_product() -> Vec<Product> {
-        let conn = establish_connection();
+    pub fn all_product(conn: PgPooledConnection) -> Vec<Product> {
 
         let resutl = products::table.load::<Product>(&conn).unwrap();
         resutl
     }
 
-    pub fn create_product(new_product: NewProduct) -> Result<Self, diesel::result::Error> {
-        let conn = establish_connection();
+    pub fn create_product(new_product: NewProduct, conn: PgPooledConnection) -> Result<Self, diesel::result::Error> {
      
         let result = diesel::insert_into(products::table).values(new_product).get_result(&conn).unwrap();
 
         Ok(result)
     }
 
-    pub fn findById(id: i32) -> Product {
-        let conn = establish_connection();
+    pub fn findById(id: i32, conn: PgPooledConnection) -> Product {
         let result = products::table.find(id).first::<Product>(&conn).unwrap();
 
         result
     }
 
-    pub fn findByIdAndUpdate(product: Product) -> Product {
-        let conn = establish_connection();
+    pub fn findByIdAndUpdate(product: Product, conn: PgPooledConnection) -> Product {
         let result = diesel::update(products::table).filter(products::id.eq(product.id)).set(product).get_result::<Product>(&conn).unwrap();
         
         //let result = diesel::update(products::table.find(product.id)).set(product).get_result::<Product>(&conn).unwrap();
@@ -53,8 +49,7 @@ impl Product {
         result
     }
 
-    pub fn findByIdAndRemove(id: i32) -> usize {
-        let conn = establish_connection();
+    pub fn findByIdAndRemove(id: i32, conn: PgPooledConnection) -> usize {
         let result = diesel::delete(products::table.find(id)).execute(&conn).unwrap();
 
         result
