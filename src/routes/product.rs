@@ -18,6 +18,7 @@ async fn find_product(_req: HttpRequest, id: web::Path<i32>, pool: web::Data<PgP
 
 #[post("/products")]
 async fn create_product(_req: HttpRequest, product: web::Json<NewProduct>, pool: web::Data<PgPool>) -> HttpResponse {
+    println!("saving products");
     let pg_pool = pg_pool_handler(pool).unwrap();
     let result = Product::create_product(product.into_inner(), pg_pool).unwrap();
     HttpResponse::Ok().json(result)

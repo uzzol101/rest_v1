@@ -22,7 +22,7 @@ async fn index() -> HttpResponse {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
-        App::new().data(db_connection::establish_connection()).configure(routes::product::init_routes)
+        App::new().data(db_connection::establish_connection()).configure(routes::product::init_routes).configure(routes::user::init_routes)
     })
     .bind("127.0.0.1:8082")?
     .run()
